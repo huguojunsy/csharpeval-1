@@ -1061,11 +1061,8 @@ namespace ExpressionEvaluator.Parser
                 re = TypeConversion.EnumConversion(ref re);
                 le = TypeConversion.EnumConversion(ref le);
 
-                var ret = re.Type;
-                var let = le.Type;
-
-                TypeConversion.ImplicitConversion(ref le, ret);
-                TypeConversion.ImplicitConversion(ref re, let);
+                
+                TypeConversion.ImplicitConversion(ref le, ref re);
                 //TypeConversion.BinaryNumericPromotion(expressionType, ref le, ref re);
                 //le = TypeConversion.DynamicConversion(re, le);
                 return GetBinaryOperator(le, re, expressionType);

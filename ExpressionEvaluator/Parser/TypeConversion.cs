@@ -137,7 +137,7 @@ namespace ExpressionEvaluator.Parser
                 if (Instance._typePrecedence[le.Type] < Instance._typePrecedence[re.Type]) le = Expression.Convert(le, re.Type);
             }
         }
-
+        
         /// <summary>
         /// Performs implicit conversion on an expression against a specified type
         /// </summary>
@@ -263,7 +263,7 @@ namespace ExpressionEvaluator.Parser
         public static bool ImplicitConversion(ref Expression src, Type destType)
         {
             return src.Type != destType && (
-                    (destType.IsNumericType() && src.Type.IsNumericType() && ImplicitNumericConversion(ref src, destType)) ||
+                    ImplicitNumericConversion(ref src, destType) ||
                     NullableConverion(ref src, destType) ||
                     NullLiteralConverion(ref src, destType) ||
                     ReferenceConversion(ref src, destType) ||
@@ -271,6 +271,41 @@ namespace ExpressionEvaluator.Parser
                     DynamicConversion(ref src, destType) ||
                     ImplicitConstantConversion(ref src, destType)
                 );
+        }
+
+        public static void ImplicitConversion(ref Expression le, ref Expression re)
+        {
+            if (le.Type != re.Type)
+            {
+                var leType = le.Type.GetNotNullable();
+                var reType = re.Type.GetNotNullable();
+                Type maxCommonType = null;
+                if (leType == reType) //the only difference is the nullable
+                {
+                    maxCommonType = typeof(Nullable<>).MakeGenericType(leType);
+                }
+                else if (Instance._typePrecedence.ContainsKey(leType) && Instance._typePrecedence.ContainsKey(reType))
+                {
+                    maxCommonType = Instance._typePrecedence[leType] < Instance._typePrecedence[reType] ? reType : leType;
+                    if (le.Type.IsNullable() || re.Type.IsNullable())
+                        maxCommonType = typeof(Nullable<>).MakeGenericType(maxCommonType);
+                }
+                if (maxCommonType != null)
+                {
+                    ImplicitConversion(ref le, maxCommonType);
+                    ImplicitConversion(ref re, maxCommonType);
+                    return;
+                }
+                if (le.Type.IsNullable() || re.Type.IsNullable())
+                {
+                    if (!le.Type.IsNullable())
+                        ImplicitConversion(ref le, typeof(Nullable<>).MakeGenericType(le.Type));
+                    if (!re.Type.IsNullable())
+                        ImplicitConversion(ref re, typeof(Nullable<>).MakeGenericType(re.Type));
+                }
+                ImplicitConversion(ref le, re.Type);
+                ImplicitConversion(ref re, le.Type);
+            }
         }
 
         // 6.1.9 Implicit constant expression conversions
@@ -283,12 +318,12 @@ namespace ExpressionEvaluator.Parser
                 if (src.Type == typeof(int))
                 {
                     var value = (int)((ConstantExpression)src).Value;
-                    if (destType == typeof (sbyte))
+                    if (destType == typeof(sbyte))
                     {
                         if (value >= SByte.MinValue && value <= SByte.MinValue)
                         {
                             src = Expression.Convert(src, typeof(sbyte));
-                            return true;                         
+                            return true;
                         }
                     }
                     if (destType == typeof(byte))
@@ -296,7 +331,7 @@ namespace ExpressionEvaluator.Parser
                         if (value >= Byte.MinValue && value <= Byte.MaxValue)
                         {
                             src = Expression.Convert(src, typeof(byte));
-                            return true;                         
+                            return true;
                         }
                     }
                     if (destType == typeof(short))
@@ -304,7 +339,7 @@ namespace ExpressionEvaluator.Parser
                         if (value >= Int16.MinValue && value <= Int16.MaxValue)
                         {
                             src = Expression.Convert(src, typeof(short));
-                            return true;                         
+                            return true;
                         }
                     }
                     if (destType == typeof(ushort))
@@ -312,7 +347,7 @@ namespace ExpressionEvaluator.Parser
                         if (value >= UInt16.MinValue && value <= UInt16.MaxValue)
                         {
                             src = Expression.Convert(src, typeof(ushort));
-                            return true;                         
+                            return true;
                         }
                     }
                     if (destType == typeof(uint))
@@ -320,7 +355,7 @@ namespace ExpressionEvaluator.Parser
                         if (value >= UInt32.MinValue && value <= UInt32.MaxValue)
                         {
                             src = Expression.Convert(src, typeof(uint));
-                            return true;                         
+                            return true;
                         }
                     }
                     if (destType == typeof(ulong))
@@ -390,9 +425,9 @@ namespace ExpressionEvaluator.Parser
         public static bool ImplicitNumericConversion(ref Expression src, Type target)
         {
             List<Type> allowed;
-            if (ImplicitNumericConversions.TryGetValue(src.Type, out allowed))
+            if (ImplicitNumericConversions.TryGetValue(src.Type.GetNotNullable(), out allowed))
             {
-                if (allowed.Contains(target))
+                if (allowed.Contains(target.GetNotNullable()))
                 {
                     src = Expression.Convert(src, target);
                     return true;
@@ -413,7 +448,8 @@ namespace ExpressionEvaluator.Parser
                     {typeof (short), 4},
                     {typeof (long), 5},
                     {typeof (float), 6},
-                    {typeof (double), 7}
+                    {typeof (double), 7},
+                    {typeof (decimal), 8}
                 };
 
             ImplicitNumericConversions.Add(typeof(sbyte), new List<Type>() { typeof(short), typeof(int), typeof(long), typeof(float), typeof(double), typeof(decimal) });
@@ -426,6 +462,8 @@ namespace ExpressionEvaluator.Parser
             ImplicitNumericConversions.Add(typeof(ulong), new List<Type>() { typeof(float), typeof(double), typeof(decimal) });
             ImplicitNumericConversions.Add(typeof(char), new List<Type>() { typeof(ushort), typeof(int), typeof(uint), typeof(long), typeof(ulong), typeof(float), typeof(double), typeof(decimal) });
             ImplicitNumericConversions.Add(typeof(float), new List<Type>() { typeof(double) });
+            ImplicitNumericConversions.Add(typeof(double), new List<Type>() { typeof(ushort), typeof(int), typeof(uint), typeof(long), typeof(ulong), typeof(float), typeof(decimal) });
+            ImplicitNumericConversions.Add(typeof(decimal), new List<Type>() { typeof(ushort), typeof(int), typeof(uint), typeof(long), typeof(ulong), typeof(float), typeof(double) });
         }
     }
 }

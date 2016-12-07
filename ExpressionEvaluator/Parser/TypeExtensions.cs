@@ -28,6 +28,11 @@ namespace ExpressionEvaluator.Parser
             return NumericTypes.Contains(type);
         }
 
+        public static Type GetNotNullable(this Type type)
+        {
+            return Nullable.GetUnderlyingType(type) ?? type;
+        }
+
         public static bool IsDynamicOrObject(this Type type)
         {
             return type.GetInterfaces().Contains(typeof(IDynamicMetaObjectProvider)) ||
