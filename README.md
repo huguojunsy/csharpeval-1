@@ -46,11 +46,14 @@ For more details see [Updates]
 * Pre-registered default types e.g. bool, int, double, float, char, string
 * Supports nested function calls (x.method(y.method(z.method()), y.method2()))
 
-# Donate
+# Buy me a Beer!
 
-Expression Evaluator is 100% free, but if you would like to support the project in any way please do so.
+Programming sure is hard work.  A cold beer would really be appreciated!
 
-[![Donate](https://www.paypalobjects.com/webstatic/en_US/btn/btn_donate_cc_147x47.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=rupert.avery@gmail.com&lc=PH&item_name=Expression Evaluator&currency_code=USD&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted)
+* [Buy me an expensive beer! - USD 5.00](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=rupert.avery@gmail.com&lc=PH&item_name=Donate a $5 Beer - Expression Evaluator&currency_code=USD&amount=5.00)
+* [Buy me a nice, probably imported beer! - USD 3.00](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=rupert.avery@gmail.com&lc=PH&item_name=Donate a $3 Beer - Expression Evaluator&currency_code=USD&amount=3.00)
+* [Buy me a good beer! - USD 2.00](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=rupert.avery@gmail.com&lc=PH&item_name=Donate a $2 Beer - Expression Evaluator&currency_code=USD&amount=2.00)
+* [Buy me a cheap, but decent beer! - USD 1.00](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=rupert.avery@gmail.com&lc=PH&item_name=Donate a $1 Beer - Expression Evaluator&currency_code=USD&amount=1.00)
 
 # Disclaimer
 
